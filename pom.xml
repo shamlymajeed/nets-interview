@@ -8,10 +8,10 @@
 		<version>2.5.10</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>eu.nets.uni.apps.settlement</groupId>
-	<artifactId>interview</artifactId>
+	<groupId>eu.nets.uni.apps.settlement.interview</groupId>
+	<artifactId>interview-application</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>interview</name>
+	<name>interview-application</name>
 	<description>Spring Boot - Interview project</description>
 	<properties>
 		<java.version>11</java.version>
@@ -44,6 +44,11 @@
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
