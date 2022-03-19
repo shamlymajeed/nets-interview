@@ -1,28 +1,52 @@
 ---
-version: '2'
+version: '3.7'
 services:
+
+  mongo:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+    deploy:
+      resources:
+        limits:
+          memory: 500m
+        reservations:
+          memory: 200m
+
+  mongo-express:
+    image: mongo-express
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: password
+      ME_CONFIG_MONGODB_AUTH_DATABASE: auth
+      ME_CONFIG_MONGODB_URL: mongodb://admin:password@mongodb:27017/?ssl=false
+    restart: always
+    ports:
+      - 8081:8081
 
   kafka-ui:
     container_name: kafka-ui
     image: provectuslabs/kafka-ui:latest
     ports:
-      - 8080:8080
+      - 8082:8082
     depends_on:
       - zookeeper0
       - kafka0
-#      - schemaregistry0
-#      - kafka-connect0
     environment:
+      SERVER_PORT: 8082
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka0:29092
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper0:2181
       KAFKA_CLUSTERS_0_JMXPORT: 9997
-#      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schemaregistry0:8085
-#      KAFKA_CLUSTERS_0_KAFKACONNECT_0_NAME: first
-#      KAFKA_CLUSTERS_0_KAFKACONNECT_0_ADDRESS: http://kafka-connect0:8083
 
   zookeeper0:
-    image: confluentinc/cp-zookeeper:5.2.4
+    image: confluentinc/cp-zookeeper:5.4.0
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -30,7 +54,7 @@ services:
       - 2181:2181
 
   kafka0:
-    image: confluentinc/cp-kafka:5.3.1
+    image: confluentinc/cp-kafka:5.4.0
     depends_on:
       - zookeeper0
     ports:
@@ -46,30 +70,5 @@ services:
       JMX_PORT: 9997
       KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.rmi.port=9997
 
-#  schemaregistry0:
-#    image: confluentinc/cp-schema-registry:5.5.0
-#    ports:
-#      - 8085:8085
-#    depends_on:
-#      - zookeeper0
-#      - kafka0
-#    environment:
-#      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka0:29092
-#      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper0:2181
-#      SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: PLAINTEXT
-#      SCHEMA_REGISTRY_HOST_NAME: schemaregistry0
-#      SCHEMA_REGISTRY_LISTENERS: http://schemaregistry0:8085
-#
-#      SCHEMA_REGISTRY_SCHEMA_REGISTRY_INTER_INSTANCE_PROTOCOL: "http"
-#      SCHEMA_REGISTRY_LOG4J_ROOT_LOGLEVEL: INFO
-#      SCHEMA_REGISTRY_KAFKASTORE_TOPIC: _schemas
-
-  kafka-init-topics:
-    image: confluentinc/cp-kafka:5.3.1
-    volumes:
-      - ./message.json:/data/message.json
-    depends_on:
-      - kafka0
-    command: "bash -c 'echo Waiting for Kafka to be ready... && \
-               cub kafka-ready -b kafka0:29092 1 30 && \
-               kafka-topics --create --topic second.users --partitions 1 --if-not-exists --zookeeper zookeeper1:2181'"
+volumes:
+  mongodata:
