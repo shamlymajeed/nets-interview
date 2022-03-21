@@ -15,6 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
@@ -99,9 +102,10 @@ public class ReportServiceImplTests {
         BigDecimal avgNokValueOfsameTimeStamp = (NOK_VALUE.add(ANOTHER_NOK_VALUE).add(NOK_VALUE)).divide(BigDecimal.valueOf(3), RoundingMode.HALF_UP);
 
         ReportDto reportDto = reportService.getAverageExchangeRate(Currency.EUR);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.from(ZoneOffset.UTC));
 
         assertThat(reportDto.getReports().get(0).getCurrencyAverageRates().get(0).getAverageRate().equals(avgNokValueOfsameTimeStamp));
-        assertThat(reportDto.getReports().get(0).getTime()==sameTimestamp);
+        assertThat(reportDto.getReports().get(0).getTime()==formatter.format(sameTimestamp));
     }
 
 

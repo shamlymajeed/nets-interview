@@ -14,7 +14,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -101,7 +103,8 @@ public class ReportServiceImpl implements  ReportService{
 
             ReportDto.TimeWiseReportDTO timeWiseReportDTO = new ReportDto.TimeWiseReportDTO();
             timeWiseReportDTO.setCurrencyAverageRates(currencyAverageRateDtoList);
-            timeWiseReportDTO.setTime(time);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.from(ZoneOffset.UTC));
+            timeWiseReportDTO.setTime(formatter.format(time));
 
             timeWiseReports.add(timeWiseReportDTO);
             reportDto.setReports(timeWiseReports);

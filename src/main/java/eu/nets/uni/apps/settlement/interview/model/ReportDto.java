@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +27,7 @@ public class ReportDto {
 
     @Data
     public static class TimeWiseReportDTO{
-        Instant time;
+        String time;
 
         @JacksonXmlElementWrapper(useWrapping = false)
         List<CurrencyAverageRateDto> currencyAverageRates;
