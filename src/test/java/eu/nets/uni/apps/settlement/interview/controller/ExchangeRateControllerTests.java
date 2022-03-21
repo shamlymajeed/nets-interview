@@ -60,7 +60,7 @@ public class ExchangeRateControllerTests {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/v1/exchange-rates/EUR/YER?base-currency-amount=100")
                     .accept(MediaType.APPLICATION_JSON))
                     .andDo(print())
-                    .andExpect(status().isNoContent())
+                    .andExpect(status().isNotFound())
                     .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Exchange rate for the given currency is not available."));
     }
 
