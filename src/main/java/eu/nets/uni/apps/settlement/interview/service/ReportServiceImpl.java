@@ -6,7 +6,8 @@ import eu.nets.uni.apps.settlement.interview.model.ExchangeRateEntry;
 import eu.nets.uni.apps.settlement.interview.model.ExchangeRates;
 import eu.nets.uni.apps.settlement.interview.model.ReportDto;
 import eu.nets.uni.apps.settlement.interview.repository.ExchangeRateRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -22,18 +23,21 @@ import java.util.List;
 import java.util.Map;
 
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Component
 public class ReportServiceImpl implements  ReportService{
 
-    private ExchangeRateRepository exchangeRateRepository;
+    private final ExchangeRateRepository exchangeRateRepository;
 
-    private ReportDto reportDto;
+    private final ReportDto reportDto;
+
+    @Value("${interview.fetch-report-of-last-minutes:10}")
+    private Integer fetchReportOfLastMinutes;
 
 
     public ReportDto getAverageExchangeRate(Currency baseCurrency) throws ExchangeRateNotAvailableException{
 
-        LocalDateTime dateTimeBefore = LocalDateTime.now(ZoneOffset.UTC).minus(10, ChronoUnit.MINUTES);
+        LocalDateTime dateTimeBefore = LocalDateTime.now(ZoneOffset.UTC).minus(fetchReportOfLastMinutes, ChronoUnit.MINUTES);
         List<ExchangeRates> exchangeRatesList = exchangeRateRepository.findByBaseCurrencyAndTimestampGreaterThanOrderByTimestampAsc(baseCurrency,dateTimeBefore.toInstant(ZoneOffset.UTC));
 
         if(exchangeRatesList.size() == 0)
@@ -80,7 +84,7 @@ public class ReportServiceImpl implements  ReportService{
 
     private void createDto(Instant time , Map<Currency, BigDecimal> averageMap, int numberOfEntriesInAMinute){
 
-            List<ReportDto.AnotherDTO>  timeMap = reportDto.getReports();
+            List<ReportDto.TimeWiseReportDTO>  timeWiseReports = reportDto.getReports();
             List<ReportDto.CurrencyAverageRateDto> currencyAverageRateDtoList = new ArrayList<>();
 
             for (var entry : averageMap.entrySet()) {
@@ -95,12 +99,12 @@ public class ReportServiceImpl implements  ReportService{
                 currencyAverageRateDtoList.add(averageRateDto);
             }
 
-            ReportDto.AnotherDTO anotherDTO = new ReportDto.AnotherDTO();
-            anotherDTO.setCurrencyAverageRates(currencyAverageRateDtoList);
-            anotherDTO.setTime(time);
+            ReportDto.TimeWiseReportDTO timeWiseReportDTO = new ReportDto.TimeWiseReportDTO();
+            timeWiseReportDTO.setCurrencyAverageRates(currencyAverageRateDtoList);
+            timeWiseReportDTO.setTime(time);
 
-            timeMap.add(anotherDTO);
-            reportDto.setReports(timeMap);
+            timeWiseReports.add(timeWiseReportDTO);
+            reportDto.setReports(timeWiseReports);
 
     }
 

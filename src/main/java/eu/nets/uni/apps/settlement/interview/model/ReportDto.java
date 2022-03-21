@@ -24,10 +24,10 @@ public class ReportDto {
     private Currency baseCurrency;
 
     @JacksonXmlElementWrapper(useWrapping = false)
-    private List<AnotherDTO> reports = new ArrayList<>();
+    private List<TimeWiseReportDTO> reports = new ArrayList<>();
 
     @Data
-    public static class AnotherDTO{
+    public static class TimeWiseReportDTO{
         Instant time;
 
         @JacksonXmlElementWrapper(useWrapping = false)
