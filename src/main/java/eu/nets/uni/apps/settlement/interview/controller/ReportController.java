@@ -3,8 +3,10 @@ package eu.nets.uni.apps.settlement.interview.controller;
 import eu.nets.uni.apps.settlement.interview.enums.Currency;
 import eu.nets.uni.apps.settlement.interview.model.ReportDto;
 import eu.nets.uni.apps.settlement.interview.service.ReportService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
@@ -28,6 +30,9 @@ public class ReportController {
         this.xmlMapperProvider = xmlMapperProvider;
     }
 
+    @Operation(summary = "Download report of average exchange rate",
+                description = "Download report of average exchange rate in xml format for last 10 minutes grouped by minute",
+                tags = { "report" })
     @GetMapping(value = "/v1/exchange-rates/{baseCurrency}/report")
     public ResponseEntity<Resource> downloadAverageExchangeRateReport(@PathVariable Currency baseCurrency) throws Exception {
 
@@ -36,7 +41,10 @@ public class ReportController {
         String xml = xmlMapperProvider.getObjectMapper().writeValueAsString(reportDto);
         InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
 
+        HttpHeaders header = new HttpHeaders();
+        header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=report.xml");
         return ResponseEntity.ok()
+                .headers(header)
                 .contentLength(xml.getBytes().length)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
