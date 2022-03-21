@@ -26,7 +26,7 @@ public class ExchangeRateController {
         this.exchangeRateService = exchangeRateService;
     }
 
-    @GetMapping(value = "/v1/exchange-rates/{baseCurrency}")
+    @GetMapping(value = "/v1/exchange-rates/{baseCurrency}",produces = "application/json")
     public ResponseEntity<ExchangeRates> getLatestExchangeRate(@PathVariable Currency baseCurrency,
                                                                @RequestParam(value = "datetime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)LocalDateTime datetime) throws ExchangeRateNotAvailableException {
 
@@ -34,7 +34,7 @@ public class ExchangeRateController {
         return new ResponseEntity<>(exchangeRates, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/v1/exchange-rates/{baseCurrency}/{currency}")
+    @GetMapping(value = "/v1/exchange-rates/{baseCurrency}/{currency}",produces = "application/json")
     public ResponseEntity<BaseCurrencyToCurrencyAmountDTO> getAmountFromLatestExchangeRate(@PathVariable Currency baseCurrency,
                                                                                            @PathVariable Currency currency,
                                                                                            @RequestParam(value = "base-currency-amount") BigDecimal baseCurrencyAmount) throws ExchangeRateNotAvailableException {
